@@ -1,4 +1,4 @@
-# PostCare — AI Post-Operative Wound Care Platform
+# PostCareAI: A Multimodal Multi-Agent System for Clinician-Supervised Post-Operative Patient Follow-Up
 
 Multi-agent post-operative care system: patients upload wound photos and daily logs; **MedSigLIP** assesses the wound; **RAG + safety rules + LLM agents** guide the patient and prioritize cases on the **clinician dashboard** (human-in-the-loop).
 
