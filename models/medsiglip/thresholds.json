@@ -1,0 +1,8 @@
+{
+  "healing_status": 0.47,
+  "erythema": 0.39,
+  "edema": 0.44,
+  "infection_risk": 0.58,
+  "urgency": 0.61,
+  "exudate": 0.42
+}

@@ -1,0 +1,19 @@
+{
+  "base_model": "google/medsiglip-448",
+  "num_labels": 6,
+  "labels": [
+    "healing_status",
+    "erythema",
+    "edema",
+    "infection_risk",
+    "urgency",
+    "exudate"
+  ],
+  "image_size": 448,
+  "unfrozen_blocks": 8,
+  "model_version": "postcare-medsiglip-v1",
+  "training_run": "run2-best",
+  "training_config": "training/configs/run2_best.yaml",
+  "threshold_strategy": "youden_j",
+  "notes": "Replace thresholds.json after Run 2 training export. Weights are not committed to git."
+}
