@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PostCare AI — Clinician</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-title">PostCare AI</div>
+      <div class="brand-sub">Site Admin</div>
+    </div>
+    <nav>
+      <a href="#" class="nav-item" data-view="dashboard">Dashboard</a>
+      <a href="#" class="nav-item active" data-view="patients">Patient Management</a>
+      <a href="#" class="nav-item" data-view="referral">Referral Physician</a>
+      <a href="#" class="nav-item" data-view="settings">Settings</a>
+    </nav>
+    <div class="sidebar-foot">PKLI · Lahore</div>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <div>
+        <h1 id="page-title">Patient Management</h1>
+        <p class="muted">Pakistan Kidney and Liver Institute (Lahore)</p>
+        <p class="dept">Department: Liver Transplant</p>
+      </div>
+      <button class="btn primary" id="refresh-btn">Refresh</button>
+    </header>
+
+    <section id="view-patients">
+      <div class="stats">
+        <article class="stat-card"><span>Discharge patients</span><strong id="stat-discharge">0</strong></article>
+        <article class="stat-card"><span>On track</span><strong id="stat-track">0</strong></article>
+        <article class="stat-card"><span>Completed</span><strong id="stat-done">0</strong></article>
+      </div>
+
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search patients…" />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Patient Name</th>
+              <th>Procedure</th>
+              <th>Consultant Surgeon</th>
+              <th>Discharge Date</th>
+              <th>Priority Tag</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="cases-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="view-dashboard" class="hidden">
+      <div class="card placeholder">Dashboard overview — use Patient Management for live cases.</div>
+    </section>
+    <section id="view-referral" class="hidden">
+      <div class="card placeholder">Referral physician module — Phase 5+.</div>
+    </section>
+    <section id="view-settings" class="hidden">
+      <div class="card form">
+        <label>API URL<input id="api-url" value="" /></label>
+        <button class="btn primary" id="save-api">Save</button>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="detail-modal">
+    <div id="detail-content"></div>
+    <button class="btn" id="close-modal">Close</button>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>PostCare — Patient</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>PostCare</h1>
+    <p class="subtitle">AI recovery companion</p>
+  </header>
+
+  <main id="app">
+    <section id="tab-recovery" class="panel">
+      <div class="card hero">
+        <h2>Recovery dashboard</h2>
+        <p id="recovery-status" class="muted">Take a wound photo and log your symptoms to start.</p>
+        <button id="start-checkin" class="btn primary">Start daily check-in</button>
+      </div>
+      <div id="recovery-flow" class="card flow hidden">
+        <h3>Your care path</h3>
+        <ol>
+          <li>Photo &amp; details submitted</li>
+          <li>MedSigLIP wound assessment</li>
+          <li>PostCare-RAG recovery chat</li>
+          <li>Clinician review if needed</li>
+        </ol>
+      </div>
+      <div id="recovery-metrics" class="metrics hidden"></div>
+      <div id="recovery-guidance" class="card hidden"></div>
+    </section>
+
+    <section id="tab-log" class="panel active">
+      <div class="steps">
+        <span class="step active">1. Photo</span>
+        <span class="step">2. Details</span>
+        <span class="step">3. Submit</span>
+      </div>
+      <form id="log-form" class="card form">
+        <h2>Daily check-in</h2>
+        <p class="muted">Start here — upload today's wound photo and tell us how you're feeling.</p>
+        <label class="photo-label">
+          Wound photo
+          <input type="file" name="image" accept="image/*" capture="environment" required />
+          <img id="photo-preview" class="photo-preview hidden" alt="Wound preview" />
+        </label>
+        <label>Your name<input name="patient_name" required placeholder="Full name" /></label>
+        <label>Pain (0–10)<input type="range" name="pain_score" min="0" max="10" value="3" /><span id="pain-val">3</span></label>
+        <label>Procedure<input name="procedure" value="Liver transplant" required /></label>
+        <label>Days after surgery<input type="number" name="post_op_day" min="0" value="5" required /></label>
+        <label>Discharge date<input type="date" name="discharge_date" /></label>
+        <label>Consultant surgeon<input name="consultant_surgeon" placeholder="Dr. …" /></label>
+        <label>Symptoms <span class="muted">(comma separated)</span><input name="symptoms" placeholder="fatigue, mild redness" /></label>
+        <button type="submit" class="btn primary">Submit photo &amp; analyze</button>
+        <p id="log-msg" class="msg"></p>
+      </form>
+    </section>
+
+    <section id="tab-chat" class="panel">
+      <div class="card chat-card">
+        <h2>Recovery chat (RAG)</h2>
+        <p id="chat-status" class="muted">Semantic search over care PDFs + your recovery data.</p>
+        <div id="chat-log" class="chat-log"></div>
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" placeholder="Ask about your recovery…" autocomplete="off" disabled />
+          <button type="submit" class="btn primary" disabled>Send</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-reminders" class="panel">
+      <div class="card">
+        <h2>Medication reminders</h2>
+        <p class="muted ponytail">localStorage only — wire push notifications later.</p>
+        <form id="reminder-form" class="inline-form">
+          <input name="med" placeholder="Medication name" required />
+          <input name="time" type="time" required />
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <ul id="reminder-list"></ul>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="panel">
+      <div class="card form">
+        <h2>Settings</h2>
+        <label>API URL<input id="api-url" placeholder="http://127.0.0.1:8000" /></label>
+        <button id="save-settings" class="btn primary">Save</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-tab="log" class="active">Check-in</button>
+    <button data-tab="recovery">Recovery</button>
+    <button data-tab="chat">Chat</button>
+    <button data-tab="reminders">Meds</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>

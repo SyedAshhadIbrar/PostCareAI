@@ -1,0 +1,120 @@
+:root {
+  --bg: #0f1117;
+  --sidebar: #12151c;
+  --panel: #181b24;
+  --border: #2a2f3a;
+  --text: #e8eaed;
+  --muted: #9aa0a6;
+  --accent: #ffffff;
+  --high: #ef4444;
+  --review: #f59e0b;
+  --routine: #22c55e;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.sidebar {
+  width: 240px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+}
+.brand { padding: 0 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+.brand-title { font-weight: 700; font-size: 1.05rem; }
+.brand-sub { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+nav { padding: 1rem 0; flex: 1; }
+.nav-item {
+  display: block;
+  padding: 0.65rem 1.25rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+.nav-item.active, .nav-item:hover { background: #1f2430; color: var(--text); }
+.sidebar-foot { padding: 1rem 1.25rem; color: var(--muted); font-size: 0.75rem; }
+.main { flex: 1; padding: 1.5rem 2rem; overflow: auto; }
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
+.header h1 { margin: 0 0 0.35rem; font-size: 1.5rem; }
+.muted { color: var(--muted); margin: 0; font-size: 0.9rem; }
+.dept { margin: 0.25rem 0 0; font-size: 0.85rem; color: #cbd5e1; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.stat-card span { display: block; color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+.stat-card strong { font-size: 1.75rem; }
+.toolbar { margin-bottom: 0.75rem; }
+.toolbar input {
+  width: 100%; max-width: 360px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+}
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: auto;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+tr:hover td { background: #1c2030; }
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.tag.high { background: rgba(239,68,68,.15); color: var(--high); }
+.tag.needs_review { background: rgba(245,158,11,.15); color: var(--review); }
+.tag.routine { background: rgba(34,197,94,.15); color: var(--routine); }
+.btn {
+  border: 1px solid var(--border);
+  background: #222733;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-right: 0.35rem;
+}
+.btn.primary { background: var(--accent); color: #111; border-color: var(--accent); font-weight: 600; }
+.hidden { display: none !important; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+.placeholder { color: var(--muted); }
+.form label { display: block; margin-bottom: 0.75rem; }
+.form input { width: 100%; max-width: 420px; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border); background: #111; color: var(--text); }
+dialog {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  max-width: 560px;
+  width: 90%;
+}
+#detail-content { margin-bottom: 1rem; line-height: 1.5; font-size: 0.9rem; white-space: pre-wrap; }
+
+@media (max-width: 900px) {
+  body { flex-direction: column; }
+  .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
+  nav { display: flex; overflow-x: auto; }
+  .stats { grid-template-columns: 1fr; }
+}
