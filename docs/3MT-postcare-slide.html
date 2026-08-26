@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PostCare AI — 3MT Slide</title>
+  <style>
+    :root {
+      --navy: #0f172a;
+      --blue: #1d4ed8;
+      --sky: #dbeafe;
+      --text: #1e293b;
+      --muted: #64748b;
+      --white: #ffffff;
+      --accent: #2563eb;
+      --green: #059669;
+      --amber: #d97706;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #e2e8f0;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      display: flex; gap: 0.5rem; padding: 0.5rem 1rem;
+      background: var(--navy); color: #fff; font-size: 0.85rem;
+    }
+    .toolbar button {
+      background: var(--blue); color: #fff; border: none;
+      padding: 0.4rem 0.85rem; border-radius: 6px; cursor: pointer; font: inherit;
+    }
+    .toolbar button.secondary { background: #334155; }
+    .wrap { max-width: 1280px; margin: 3rem auto 2rem; padding: 0 1rem; }
+
+    /* ── 3MT SINGLE SLIDE (16:9) ── */
+    .slide {
+      aspect-ratio: 16 / 9;
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      box-shadow: 0 8px 32px rgba(15,23,42,.12);
+    }
+    .slide-left {
+      background: linear-gradient(160deg, var(--navy) 0%, #1e3a8a 55%, var(--blue) 100%);
+      color: #fff;
+      padding: 2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 999px;
+    }
+    .slide-left h1 {
+      font-size: clamp(1.6rem, 3vw, 2.35rem);
+      font-weight: 800; line-height: 1.15; margin: 0.75rem 0 0.5rem;
+    }
+    .tagline { font-size: 1rem; opacity: .92; max-width: 26rem; }
+    .problem {
+      background: rgba(0,0,0,.2);
+      border-left: 4px solid #fbbf24;
+      padding: 0.75rem 1rem; border-radius: 0 8px 8px 0;
+      font-size: 0.88rem;
+    }
+    .problem strong { color: #fde68a; }
+    .slide-right {
+      padding: 1.6rem 1.75rem 1.4rem;
+      display: flex; flex-direction: column; gap: 0.85rem;
+    }
+    .slide-right h2 {
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); font-weight: 700;
+    }
+    .flow {
+      display: flex; flex-direction: column; gap: 0.45rem;
+      font-size: 0.82rem;
+    }
+    .flow-step {
+      display: grid; grid-template-columns: 28px 1fr; gap: 0.55rem; align-items: start;
+    }
+    .flow-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--sky); color: var(--blue);
+      font-weight: 800; font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .flow-step b { display: block; font-size: 0.85rem; }
+    .flow-step span { color: var(--muted); font-size: 0.78rem; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .box {
+      border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.65rem 0.75rem;
+      font-size: 0.78rem;
+    }
+    .box h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 0.35rem; }
+    .box ul { padding-left: 1rem; color: var(--text); }
+    .box li { margin-bottom: 0.15rem; }
+    .impact {
+      background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px;
+      padding: 0.65rem 0.85rem; font-size: 0.82rem;
+    }
+    .impact strong { color: var(--green); }
+    .footer {
+      margin-top: auto; font-size: 0.72rem; color: var(--muted);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .author { font-weight: 600; color: var(--text); }
+
+    /* ── SPEAKER NOTES ── */
+    .notes {
+      margin-top: 1.5rem; background: #fff; border-radius: 12px;
+      padding: 1.5rem 1.75rem; box-shadow: 0 4px 16px rgba(15,23,42,.06);
+    }
+    .notes h2 { font-size: 1.1rem; margin-bottom: 0.35rem; }
+    .notes .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
+    .notes section { margin-bottom: 1rem; }
+    .notes h3 { font-size: 0.85rem; color: var(--blue); margin-bottom: 0.35rem; }
+    .notes p, .notes li { font-size: 0.92rem; margin-bottom: 0.4rem; }
+    .notes ul { padding-left: 1.25rem; }
+    .timing { display: inline-block; background: var(--sky); color: var(--blue);
+      font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px; }
+
+    /* Fullscreen */
+    body.fullscreen { background: #000; }
+    body.fullscreen .toolbar, body.fullscreen .notes { display: none; }
+    body.fullscreen .wrap { max-width: none; margin: 0; padding: 0; height: 100vh; display: flex; align-items: center; justify-content: center; }
+    body.fullscreen .slide { width: 100vw; height: 100vh; border-radius: 0; aspect-ratio: auto; max-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>PostCare AI · Three Minute Thesis</span>
+    <button onclick="toggleFullscreen()">Present slide (F11)</button>
+    <button class="secondary" onclick="window.print()">Print / PDF</button>
+  </div>
+
+  <div class="wrap">
+    <!-- ═══════════ ONE SLIDE ONLY (3MT rule) ═══════════ -->
+    <div class="slide" id="slide">
+      <div class="slide-left">
+        <div>
+          <span class="badge">3 Minute Thesis · Capstone</span>
+          <h1>PostCare AI</h1>
+          <p class="tagline">AI-guided post-operative wound monitoring with human clinicians in the loop</p>
+        </div>
+        <div class="problem">
+          <strong>Problem:</strong> After discharge, wound complications are often caught late.
+          Patients lack daily guidance; clinicians cannot review every photo manually.
+        </div>
+        <div style="font-size:0.8rem; opacity:.85;">
+          Pakistan Kidney &amp; Liver Institute · Liver Transplant context
+        </div>
+      </div>
+
+      <div class="slide-right">
+        <div>
+          <h2>Solution pipeline</h2>
+          <div class="flow">
+            <div class="flow-step">
+              <div class="flow-num">1</div>
+              <div><b>Patient check-in</b><span>Photo + pain, symptoms, post-op day</span></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">2</div>
+              <div><b>MedSigLIP (fine-tuned)</b><span>6 wound labels: healing, infection risk, urgency…</span></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">3</div>
+              <div><b>Safety rules + AI agents</b><span>Triage → patient guidance → clinician summary</span></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">4</div>
+              <div><b>RAG recovery chat</b><span>Vector search + patient case data for Q&amp;A</span></div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-num">5</div>
+              <div><b>Clinician dashboard</b><span>Priority queue · human review · mark complete</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cols">
+          <div class="box">
+            <h3>MLOps</h3>
+            <ul>
+              <li>Run 1 → Run 2 lineage</li>
+              <li>MLflow + Youden thresholds</li>
+              <li>Export to production API</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Innovation</h3>
+            <ul>
+              <li>Vision + language agents</li>
+              <li>Not diagnosis — decision support</li>
+              <li>Clinician always in control</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="impact">
+          <strong>Impact:</strong> Earlier signal detection, scalable remote monitoring,
+          and structured handoff so surgeons review the right patients first.
+        </div>
+
+        <div class="footer">
+          <span class="author">Syed Ashhad Ibrar · PostCare AI</span>
+          <span>Prototype — not clinically validated</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speaker notes (not shown when presenting) -->
+    <div class="notes">
+      <h2>Speaker notes (~3 minutes)</h2>
+      <p class="meta">Target: 400–450 words · ~130 wpm · Practice with a timer</p>
+
+      <section>
+        <h3><span class="timing">0:00–0:30</span> Hook &amp; problem</h3>
+        <p>
+          Imagine you have just had liver transplant surgery. You are sent home with instructions —
+          but who checks your wound every day? Complications like infection or poor healing often
+          show visual signs before patients realise something is wrong. In low-resource settings,
+          follow-up visits are limited, and clinicians cannot manually review hundreds of wound photos.
+          <strong>That gap between discharge and the next clinic visit is where PostCare AI operates.</strong>
+        </p>
+      </section>
+
+      <section>
+        <h3><span class="timing">0:30–1:30</span> What we built</h3>
+        <p>
+          PostCare is a multi-agent post-operative care platform. The patient opens a mobile web app,
+          uploads a daily wound photo, and logs pain and symptoms. Our fine-tuned MedSigLIP model —
+          trained on the SurgWound dataset with a documented Run 1 to Run 2 MLOps pipeline —
+          assesses six clinical visual signals: healing status, erythema, edema, infection risk,
+          urgency, and exudate.
+        </p>
+        <p>
+          Deterministic safety rules flag high pain or concerning visual scores. Then three AI agents
+          run in sequence: triage sets priority, a patient agent delivers plain-language guidance,
+          and a clinician agent prepares a structured handoff summary. Patients can also chat with a
+          RAG recovery assistant that retrieves from a vector knowledge base aligned with their
+          personal recovery data.
+        </p>
+      </section>
+
+      <section>
+        <h3><span class="timing">1:30–2:30</span> Why it matters</h3>
+        <p>
+          This is not autonomous diagnosis — it is <strong>decision support with humans in the loop</strong>.
+          High-priority cases appear on a clinician dashboard at PKLI Lahore, where a surgeon or nurse
+          can review and mark cases complete. We combine computer vision, retrieval-augmented generation,
+          and LLM agents into one pipeline — from Kaggle training to a production FastAPI backend with
+          patient and clinician frontends.
+        </p>
+        <p>
+          The MLOps story matters: Run 1 intentionally underfit to establish a baseline; Run 2 improved
+          with differential learning rates and per-label Youden thresholds — showing iterative,
+          evidence-based model development, not a single black-box training run.
+        </p>
+      </section>
+
+      <section>
+        <h3><span class="timing">2:30–3:00</span> Closing</h3>
+        <p>
+          PostCare AI aims to make post-operative wound monitoring scalable, earlier, and safer —
+          giving patients daily reassurance and giving clinicians a prioritised queue of who needs
+          attention most. Our next step is clinical validation with qualified wound-care specialists.
+          <strong>Thank you.</strong>
+        </p>
+      </section>
+
+      <section>
+        <h3>Anticipated questions</h3>
+        <ul>
+          <li><strong>Is it FDA approved?</strong> No — research prototype / capstone.</li>
+          <li><strong>Why MedSigLIP?</strong> Medical-domain vision-language model; fine-tuned for surgical wounds.</li>
+          <li><strong>What if the model is wrong?</strong> Clinician review + safety flags; not a replacement for care teams.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.();
+        document.body.classList.add("fullscreen");
+      } else {
+        document.exitFullscreen?.();
+        document.body.classList.remove("fullscreen");
+      }
+    }
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) document.body.classList.remove("fullscreen");
+    });
+  </script>
+</body>
+</html>
