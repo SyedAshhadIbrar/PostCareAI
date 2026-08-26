@@ -1,0 +1,54 @@
+# Run 2 — production config (best run)
+# Addresses Run 1 underfitting: ~7.5× optimizer steps, 2× trainable capacity,
+# differential LR, and per-label Youden's J thresholds.
+
+run:
+  name: run2-best
+  description: >
+    Improved fine-tune after Run 1 underfitting analysis. Unfreezes 8 encoder blocks,
+    uses differential LR, 300 optimizer steps, and per-label threshold tuning.
+  parent_run: run1-underfitting-baseline
+  tags:
+    stage: production
+    outcome: best
+    supersedes: run1-underfitting-baseline
+  output_dir: outputs/medsiglip-448-surgwound-v2
+
+model:
+  id: google/medsiglip-448
+  n_unfreeze: 8
+
+data:
+  dataset_name: SurgWound
+  expected_splits:
+    train: 480
+    validation: 69
+    test: 137
+  pos_weight: [1.42, 2.59, 6.56, 5.15, 7.42, 5.24]
+
+training:
+  batch_size: 4
+  grad_accum: 4
+  epochs: 10
+  differential_lr: true
+  backbone_lr: 1.5e-5
+  head_lr: 8.0e-5
+  warmup_steps: 15
+  weight_decay: 0.015
+  scheduler: cosine
+  fp16: true
+  logging_steps: 1
+  save_total_limit: 3
+  dataloader_num_workers: 2
+  metric_for_best_model: eval_loss
+
+evaluation:
+  threshold_strategy: youden_j
+  threshold_grid:
+    start: 0.10
+    stop: 0.91
+    step: 0.01
+
+mlflow:
+  experiment_name: medsiglip-surgwound
+  tracking_uri: ./mlruns
