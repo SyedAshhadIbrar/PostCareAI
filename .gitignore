@@ -1,0 +1,100 @@
+# ── Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ── Virtual environments ────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.pdm-python
+.pdm-build/
+.pixi/
+__pypackages__/
+
+# ── Secrets & local env ─────────────────────────────────────────────
+.env
+.env.*
+.envrc
+.pypirc
+.streamlit/secrets.toml
+
+# ── IDE & editors ───────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+tempCodeRunnerFile.py
+
+# ── OS junk ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Test / lint / type caches ───────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+.hypothesis/
+
+# ── Jupyter ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── PostCare: local database ─────────────────────────────────────────
+postcare.db
+*.db
+*.sqlite3
+
+# ── PostCare: vector RAG index (rebuilt on startup) ─────────────────
+data/rag_index.json
+data/rag_vectors.json
+data/test_rag_index.json
+
+# ── PostCare: MedSigLIP production weights (config/thresholds stay) ───
+models/medsiglip/*.pt
+models/medsiglip/*.bin
+models/medsiglip/*.safetensors
+models/medsiglip/preprocessor_config.json
+
+# ── PostCare: training artifacts ──────────────────────────────────────
+mlruns/
+outputs/
+training/mlruns/
+training/outputs/
+.tools/
+
+# ── Node / frontend build ───────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ── Logs ────────────────────────────────────────────────────────────
+*.log

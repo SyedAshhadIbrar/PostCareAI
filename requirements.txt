@@ -1,0 +1,24 @@
+# PostCare application
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+pydantic>=2.7.0
+
+# MedSigLIP inference (shared with training)
+torch>=2.1.0
+transformers>=4.46.0
+pillow>=10.0.0
+numpy>=1.24.0
+huggingface-hub>=0.23.0
+
+# RAG — PDF ingestion + semantic embeddings
+pypdf>=4.0.0
+sentence-transformers>=2.2.0
+
+# Phase 2+ (uncomment when wired)
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# Tests
+pytest>=8.0.0
+httpx>=0.27.0
