@@ -14,6 +14,7 @@ from backend.schemas.assessment import Finding, WoundAssessment
 from backend.schemas.case import PatientContext, PostCareCase
 from backend.schemas.chat import ChatRequest, ChatResponse
 from backend.services.agents_pipeline import run_agents
+from backend.services.case_images import save_case_image
 from backend.services.location import get_region_context
 from backend.services.safety import evaluate_safety
 from backend.services.wound_model import wound_model
@@ -58,14 +59,18 @@ async def create_case(
     if not image.content_type or not image.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Upload must be an image file.")
 
+    image_bytes = await image.read()
     if wound_model is not None:
-        wound = wound_model.predict(await image.read())
+        wound = wound_model.predict(image_bytes)
     else:
         logger.info("Using heuristic wound assessment fallback")
         wound = _mock_wound_assessment()
 
+    case_id = db.new_case_id()
+    save_case_image(case_id, image_bytes, image.content_type)
+
     case = PostCareCase(
-        case_id=db.new_case_id(),
+        case_id=case_id,
         patient=PatientContext(
             patient_name=patient_name.strip(),
             pain_score=pain_score,
@@ -114,13 +119,17 @@ async def upload_patient_log(
     active_symptoms = [k for k, v in symptoms_raw.items() if v] if isinstance(symptoms_raw, dict) else []
     patient_note = str(data.get("patient_note", "") or "").strip() or None
 
+    image_bytes = await file.read()
     if wound_model is not None:
-        wound = wound_model.predict(await file.read())
+        wound = wound_model.predict(image_bytes)
     else:
         wound = _mock_wound_assessment()
 
+    case_id = db.new_case_id()
+    save_case_image(case_id, image_bytes, file.content_type)
+
     case = PostCareCase(
-        case_id=db.new_case_id(),
+        case_id=case_id,
         patient=PatientContext(
             patient_name=str(data.get("patient_name", "PKLI Patient")),
             pain_score=pain_level,

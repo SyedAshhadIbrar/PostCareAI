@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 
 from backend.database import db
+from backend.services.case_images import case_has_image, case_image_path
 
 router = APIRouter(prefix="/clinician", tags=["clinician"])
 
@@ -80,7 +82,23 @@ async def get_case(case_id: str):
     case = db.get_case(case_id)
     if case is None:
         raise HTTPException(status_code=404, detail="Case not found.")
-    return case.model_dump()
+    payload = case.model_dump()
+    payload["has_wound_image"] = case_has_image(case_id)
+    if payload["has_wound_image"]:
+        payload["wound_image_url"] = f"/clinician/cases/{case_id}/image"
+    return payload
+
+
+@router.get("/cases/{case_id}/image")
+async def get_case_image(case_id: str):
+    case = db.get_case(case_id)
+    if case is None:
+        raise HTTPException(status_code=404, detail="Case not found.")
+    path = case_image_path(case_id)
+    if path is None:
+        raise HTTPException(status_code=404, detail="No wound image for this case.")
+    media = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
+    return FileResponse(path, media_type=media)
 
 
 @router.post("/cases/{case_id}/review")
