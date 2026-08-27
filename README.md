@@ -1,6 +1,6 @@
 # PostCareAI
 
-**AI-powered post-operative wound care platform** — patients submit daily wound photos and symptom logs via a mobile app; a fine-tuned **MedSigLIP** model assesses wounds; **RAG + safety rules + LLM agents** guide recovery and triage cases on a **clinician web dashboard** (human-in-the-loop).
+**A Multimodal Multi-Agent System for Clinician Supervised Post-Operative Patient Follow-Up** — patients submit daily wound photos and symptom logs via a mobile app; a fine-tuned **MedSigLIP** model assesses wounds; **RAG + safety rules + LLM agents** guide recovery and triage cases on a **clinician web dashboard** (human-in-the-loop).
 
 > **Capstone prototype** — not clinically validated. Model outputs and agent responses require review by qualified clinicians. Do not use for real medical decisions.
 
