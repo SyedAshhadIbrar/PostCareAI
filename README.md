@@ -18,7 +18,7 @@
 - **Per-label Youden J thresholds** tuned for clinical safety (high sensitivity on infection & urgency)
 - **Multi-agent pipeline** — triage → patient guidance → clinician handoff (Gemini or rule fallback)
 - **Vector RAG** over clinical care documents for 24/7 patient coaching
-- **Dual frontend** — mobile-first patient app (Whoop-style) + web clinician command center
+- **Dual frontend** — mobile-first patient app + web clinician command center
 - **Automated tests** — pytest suite covering wound API, safety rules, triage, and RAG
 
 ---
