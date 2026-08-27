@@ -349,27 +349,6 @@ mlflow ui --backend-store-uri ./mlruns    # view experiments
 
 ---
 
-## Future work
-
-- [ ] Deploy to cloud (Render / Vercel)
-- [ ] Wound photo display in clinician review modal
-- [ ] Pain trend chart across post-op days
-- [ ] JWT + bcrypt authentication
-- [ ] PostgreSQL for production
-- [ ] GitHub Actions CI (pytest on push)
-- [ ] PWA install for patient mobile app
-- [ ] Clinical validation study
-
----
-
-## Author
-
-**Syed Ashhad Ibrar** — Capstone project
-
-GitHub: [PostCareAI](https://github.com/SyedAshhadIbrar/PostCareAI)
-
----
-
 ## License
 
 See [LICENSE](LICENSE).
