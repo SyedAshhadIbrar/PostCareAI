@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ios-bg: #000000;
+  --ios-card: rgba(28, 28, 30, 0.92);
+  --ios-elevated: #1c1c1e;
+  --ios-border: rgba(255, 255, 255, 0.08);
+  --accent: #00d9b5;
+  --accent-dim: rgba(0, 217, 181, 0.15);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--ios-bg);
+  color: #ffffff;
+  min-height: 100%;
+  overflow-x: hidden;
+  font-family: "Inter", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* iOS-style cards */
+.ios-card {
+  background: var(--ios-card);
+  border: 1px solid var(--ios-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Bottom tab bar with safe area */
+.ios-tabbar {
+  background: rgba(0, 0, 0, 0.85);
+  border-top: 1px solid var(--ios-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding-bottom: max(8px, var(--safe-bottom));
+}
+
+.pb-safe {
+  padding-bottom: calc(72px + var(--safe-bottom));
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* iOS segmented control */
+.ios-segment {
+  background: rgba(118, 118, 128, 0.24);
+  border-radius: 9px;
+  padding: 2px;
+}
+
+.ios-segment button {
+  border-radius: 7px;
+  transition: all 0.2s ease;
+}
+
+.ios-segment button.active {
+  background: rgba(99, 99, 102, 0.64);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Range slider iOS style */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+/* Scrollbar hide for horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Whoop-style gradient glow */
+.glow-accent {
+  box-shadow: 0 0 40px rgba(0, 217, 181, 0.15);
+}
