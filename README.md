@@ -37,43 +37,163 @@
 
 ## Architecture
 
+### System overview
+
+```mermaid
+flowchart TB
+    subgraph Patient["Patient Mobile App"]
+        P1[Daily check-in]
+        P2[Wound photo]
+        P3[Pain + symptoms + note]
+        P4[Recovery chat]
+    end
+
+    subgraph Backend["FastAPI Backend"]
+        API[REST API]
+        CV[MedSigLIP<br/>6-label wound CV]
+        SAF[Safety rules<br/>thresholds + symptoms]
+        RAG[RAG engine<br/>MiniLM + care docs]
+        AG[Multi-agent pipeline]
+        DB[(SQLite<br/>cases + chat)]
+        IMG[(Wound images<br/>data/uploads)]
+    end
+
+    subgraph Agents["Agents"]
+        T[Triage agent]
+        PA[Patient agent]
+        CL[Clinician agent]
+        GEM[PostCare-Gemini]
+        RULES[PostCare-rules fallback]
+    end
+
+    subgraph Clinician["Clinician Web Dashboard"]
+        Q[Priority queue]
+        R[Case review modal]
+        W[Wound photo + AI scores]
+    end
+
+    P1 --> P2 & P3
+    P2 & P3 -->|POST /api/patients/upload| API
+    P4 -->|POST /api/patients/case/id/chat| API
+
+    API --> CV --> SAF --> AG
+    API --> IMG
+    AG --> T & PA & CL
+    GEM -.->|if API key set| T & PA & CL
+    RULES -.->|else| T & PA & CL
+    RAG --> PA & P4
+
+    AG --> DB
+    API --> DB
+
+    DB --> Q
+    IMG --> W
+    DB --> R
+    Q --> R
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           PATIENT (Mobile App)                          │
-│  Daily check-in: wound photo + pain slider + symptoms + optional note   │
-└──────────────────────────────────┬──────────────────────────────────────┘
-                                   │ POST /api/patients/upload
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         FastAPI Backend                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌─────────────┐ │
-│  │  MedSigLIP   │  │ Safety Rules │  │  RAG Engine  │  │   Agents    │ │
-│  │  6-label CV  │→ │  Thresholds  │→ │  MiniLM +    │→ │ Triage /    │ │
-│  │  inference   │  │  + symptoms  │  │  care PDFs   │  │ Patient /   │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │ Clinician   │ │
-│                                                         └─────────────┘ │
-│  SQLite · JWT auth · case store · chat history                          │
-└──────────────────────────────────┬──────────────────────────────────────┘
-                                   │
-          ┌────────────────────────┴────────────────────────┐
-          ▼                                                  ▼
-┌──────────────────────┐                    ┌──────────────────────────────┐
-│  Patient Recovery    │                    │  Clinician Web Dashboard     │
-│  AI coach (RAG chat) │                    │  Priority queue · case review│
-│  Metrics & care path │                    │  MedSigLIP scores · handoff  │
-└──────────────────────┘                    └──────────────────────────────┘
+
+### Check-in → clinician review
+
+```mermaid
+sequenceDiagram
+    actor Patient
+    participant App as Patient App
+    participant API as FastAPI
+    participant Model as MedSigLIP
+    participant Store as SQLite + Uploads
+    participant Agents as Agent Pipeline
+    actor Clinician
+    participant Dash as Clinician Dashboard
+
+    Patient->>App: Submit photo + pain + symptoms
+    App->>API: POST /api/patients/upload
+    API->>Model: Predict wound scores
+    Model-->>API: 6-label probabilities
+    API->>Store: Save case + wound image
+    API->>Agents: Triage → Patient → Clinician notes
+    Agents-->>API: Priority + guidance + handoff
+    API-->>App: Case result + patient guidance
+
+    Clinician->>Dash: Open review queue
+    Dash->>API: GET /clinician/cases
+    API-->>Dash: Prioritized case list
+    Clinician->>Dash: Open case
+    Dash->>API: GET /clinician/cases/{id}
+    API-->>Dash: Scores + handoff + has_wound_image
+    Dash->>API: GET /clinician/cases/{id}/image
+    API-->>Dash: Wound photo
+    Clinician->>Dash: Finalize review
+    Dash->>API: POST /clinician/cases/{id}/review
 ```
 
 ### Agent pipeline
 
-1. **MedSigLIP** — wound image → 6 probability scores
-2. **Safety rules** — combine CV scores + patient symptoms + pain level → flags
-3. **Triage agent** — assign priority (`urgent` / `review` / `routine`)
-4. **Patient agent** — empathetic recovery guidance for the patient
-5. **Clinician agent** — structured handoff note for the care team
-6. **RAG chat** — semantic search over care guides + case context
+```mermaid
+flowchart LR
+    A[Wound image] --> B[MedSigLIP inference]
+    B --> C[6 probability scores]
+    C --> D[Safety rules]
+    E[Patient symptoms + pain] --> D
+    D --> F[Safety flags]
+    F --> G[Triage agent]
+    G --> H{Priority}
+    H -->|urgent| I[High priority queue]
+    H -->|review| J[Needs review]
+    H -->|routine| K[Routine]
+    G --> L[Patient agent]
+    L --> M[Recovery guidance]
+    G --> N[Clinician agent]
+    N --> O[Handoff summary + review note]
+    P[RAG over care docs] --> L
+    P --> Q[24/7 recovery chat]
+```
 
 Agents use **PostCare-Gemini** (`gemini-2.0-flash`) when `POSTCARE_GEMINI_API_KEY` is set; otherwise **PostCare-rules** fallback.
+
+### Data model
+
+```mermaid
+erDiagram
+    CASE ||--o| WOUND_ASSESSMENT : has
+    CASE ||--o| PATIENT_CONTEXT : has
+    CASE ||--o| CLINICIAN_SUMMARY : has
+    CASE ||--o| WOUND_IMAGE : stores
+
+    CASE {
+        string case_id PK
+        string status
+        string clinician_priority
+        datetime created_at
+    }
+
+    PATIENT_CONTEXT {
+        string patient_name
+        int pain_score
+        int post_op_day
+        string procedure
+        list symptoms
+    }
+
+    WOUND_ASSESSMENT {
+        float healing_status
+        float infection_risk
+        float urgency
+        float erythema
+        float edema
+        float exudate
+    }
+
+    CLINICIAN_SUMMARY {
+        string summary
+        string review_note
+        json visual_findings
+    }
+
+    WOUND_IMAGE {
+        string file_path
+        string content_type
+    }
+```
 
 ---
 
@@ -347,7 +467,6 @@ mlflow ui --backend-store-uri ./mlruns    # view experiments
 - **Prototype auth** — demo credentials; not production-grade security
 - **No real-time monitoring** — no alerting, FHIR integration, or EHR connectivity
 
----
 
 ## License
 
