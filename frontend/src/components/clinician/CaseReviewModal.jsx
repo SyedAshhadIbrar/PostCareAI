@@ -40,6 +40,7 @@ export default function CaseReviewModal({
   const imageUrl = hasImage
     ? `${API_BASE}${caseDetail.wound_image_url}`
     : null;
+  const showImage = hasImage && !detailLoading && !imageError && imageUrl;
 
   return (
     <div
@@ -63,7 +64,7 @@ export default function CaseReviewModal({
               <p className="text-sm text-gray-400 mt-1">{selectedCase.procedure}</p>
             </div>
             <div className="flex items-start gap-3 shrink-0">
-              <PriorityTag priority={selectedCase.priority} />
+              <PriorityTag priority={selectedCase.priority} status={selectedCase.status} />
               <button
                 type="button"
                 onClick={onClose}
@@ -95,7 +96,7 @@ export default function CaseReviewModal({
                 <div className="aspect-[4/3] flex items-center justify-center text-sm text-gray-500">
                   Loading…
                 </div>
-              ) : hasImage && !imageError ? (
+              ) : showImage ? (
                 <img
                   src={imageUrl}
                   alt={`Wound photo — ${selectedCase.patient_name}`}

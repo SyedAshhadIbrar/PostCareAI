@@ -16,8 +16,8 @@ import {
 const PAGE_SIZE = 10;
 
 export default function ClinicianCasesPage({
-  title = "Clinical Command",
-  subtitle = "View & manage your recent wound assessments",
+  title = "PostCareAI Clinician Portal",
+  subtitle = "View and manage recent wound assessments",
 }) {
   const [cases, setCases] = useState([]);
   const [stats, setStats] = useState({
@@ -27,15 +27,15 @@ export default function ClinicianCasesPage({
   });
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [siteFilter, setSiteFilter] = useState(getActiveSite);
+  const [siteFilter, setSiteFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedCase, setSelectedCase] = useState(null);
   const [caseDetail, setCaseDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     try {
       const [casesRes, statsRes] = await Promise.all([
         fetch(`${API_BASE}/clinician/cases`),
@@ -52,9 +52,9 @@ export default function ClinicianCasesPage({
       }
     } catch (err) {
       console.error("ClinicianCasesPage: fetch failed —", err);
-      setCases([]);
+      if (!silent) setCases([]);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
@@ -72,8 +72,6 @@ export default function ClinicianCasesPage({
 
   const filteredCases = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    const priorityOrder = { high: 0, needs_review: 1, routine: 2 };
-
     return cases
       .filter((row) => {
         const matchesSearch =
@@ -90,10 +88,16 @@ export default function ClinicianCasesPage({
           (statusFilter === "completed" && row.status === "reviewed");
         return matchesSearch && matchesSite && matchesStatus;
       })
-      .sort(
-        (a, b) =>
-          (priorityOrder[a.priority] ?? 2) - (priorityOrder[b.priority] ?? 2)
-      );
+      .sort((a, b) => {
+        const reviewedA = a.status === "reviewed" ? 1 : 0;
+        const reviewedB = b.status === "reviewed" ? 1 : 0;
+        if (reviewedA !== reviewedB) return reviewedA - reviewedB;
+        const priorityOrder = { high: 0, needs_review: 1, routine: 2 };
+        const priorityDiff =
+          (priorityOrder[a.priority] ?? 2) - (priorityOrder[b.priority] ?? 2);
+        if (priorityDiff !== 0) return priorityDiff;
+        return (b.created_at || "").localeCompare(a.created_at || "");
+      });
   }, [cases, searchQuery, siteFilter, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredCases.length / PAGE_SIZE));
@@ -124,9 +128,19 @@ export default function ClinicianCasesPage({
 
   const handleApprove = async (caseId) => {
     try {
-      await fetch(`${API_BASE}/clinician/cases/${caseId}/review`, { method: "POST" });
+      const res = await fetch(`${API_BASE}/clinician/cases/${caseId}/review`, { method: "POST" });
+      if (!res.ok) throw new Error("Review request failed");
+
+      setCases((prev) =>
+        prev.map((c) => (c.case_id === caseId ? { ...c, status: "reviewed" } : c))
+      );
+      setStats((prev) => ({
+        ...prev,
+        pending_reviews: Math.max(0, prev.pending_reviews - 1),
+        completed: prev.completed + 1,
+      }));
       closeReview();
-      fetchData();
+      fetchData({ silent: true });
     } catch (err) {
       console.error("ClinicianCasesPage: review failed —", err);
     }
@@ -265,7 +279,7 @@ export default function ClinicianCasesPage({
                         {caseWard(row.case_id)}
                       </td>
                       <td className="py-4 px-6">
-                        <PriorityTag priority={row.priority} pill />
+                        <PriorityTag priority={row.priority} status={row.status} pill />
                       </td>
                       <td className="py-4 px-6">
                         <StatusBadge label={ai.label} tone={ai.tone} />

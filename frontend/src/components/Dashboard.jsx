@@ -3,8 +3,8 @@ import ClinicianCasesPage from "./clinician/ClinicianCasesPage";
 export default function Dashboard() {
   return (
     <ClinicianCasesPage
-      title="Clinical Command"
-      subtitle="View & manage your recent wound assessments"
+      title="PostCareAI Clinician Portal"
+      subtitle="View and manage recent wound assessments"
     />
   );
 }

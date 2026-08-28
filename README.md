@@ -19,7 +19,7 @@
 - **Multi-agent pipeline** — triage → patient guidance → clinician handoff (Gemini or rule fallback)
 - **Vector RAG** over clinical care documents for 24/7 patient coaching
 - **Dual frontend** — mobile-first patient app + web clinician command center
-- **Automated tests** — pytest suite covering wound API, safety rules, triage, and RAG
+- **Automated tests** — pytest suite covering wound API, safety rules, triage, and RAG (26 tests)
 
 ---
 
@@ -74,7 +74,7 @@ flowchart TB
 
     P1 --> P2 & P3
     P2 & P3 -->|POST /api/patients/upload| API
-    P4 -->|POST /api/patients/case/id/chat| API
+    P4 -->|POST /patient/case/id/chat| API
 
     API --> CV --> SAF --> AG
     API --> IMG
@@ -380,8 +380,8 @@ Full interactive docs: http://127.0.0.1:8000/docs
 |-------|-------------|
 | **ML** | PyTorch, Hugging Face Transformers, MedSigLIP-448, SurgWound dataset |
 | **MLOps** | MLflow, YAML configs, experiment lineage (Run 1 → Run 2) |
-| **Backend** | FastAPI, SQLAlchemy, SQLite, Pydantic |
-| **RAG** | sentence-transformers (`all-MiniLM-L6-v2`), pypdf, 16 indexed chunks |
+| **Backend** | FastAPI, sqlite3, SQLite, Pydantic |
+| **RAG** | sentence-transformers (`all-MiniLM-L6-v2`), pypdf, indexed from `rag/documents/` |
 | **Agents** | Google Gemini 2.0 Flash (optional) + rule-based fallback |
 | **Frontend** | React 18, Vite, Tailwind CSS, React Router |
 | **Testing** | pytest, httpx |

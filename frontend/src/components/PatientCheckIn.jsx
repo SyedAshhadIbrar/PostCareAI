@@ -199,7 +199,7 @@ export default function PatientCheckIn() {
             value={patientNote}
             onChange={(e) => setPatientNote(e.target.value)}
             placeholder="Any changes in pain, wound, or medications…"
-            className="w-full mt-2 bg-transparent text-sm text-white placeholder:text-white/25 outline-none resize-none"
+            className="w-full mt-2 bg-[#1c1c1e] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/25 outline-none resize-none"
           />
         </GlassCard>
 

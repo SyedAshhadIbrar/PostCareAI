@@ -80,7 +80,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/8 border border-white/10 text-white rounded-2xl py-3.5 px-4 text-sm outline-none focus:border-[#00D9B5]/50 transition-colors"
+              className="w-full bg-[#1c1c1e] border border-white/10 text-white rounded-2xl py-3.5 px-4 text-sm outline-none focus:border-[#00D9B5]/50 transition-colors placeholder:text-white/40"
               placeholder={role === "patient" ? "patient@postcare.test" : "clinician@postcare.test"}
             />
           </div>
@@ -93,7 +93,7 @@ export default function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/8 border border-white/10 text-white rounded-2xl py-3.5 px-4 text-sm outline-none focus:border-[#00D9B5]/50 transition-colors"
+              className="w-full bg-[#1c1c1e] border border-white/10 text-white rounded-2xl py-3.5 px-4 text-sm outline-none focus:border-[#00D9B5]/50 transition-colors placeholder:text-white/40"
               placeholder="••••••••"
             />
           </div>

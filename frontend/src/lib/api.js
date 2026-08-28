@@ -29,3 +29,8 @@ export function setChat(caseId, messages) {
 export function clearChat(caseId) {
   if (caseId) localStorage.removeItem(`postcare_chat_${caseId}`);
 }
+
+export function caseImageUrl(caseId) {
+  if (!caseId) return null;
+  return `${API_BASE}/clinician/cases/${caseId}/image`;
+}

@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -165,6 +166,9 @@ class WoundModel:
 
 
 def _build_wound_model() -> WoundModel | None:
+    if os.environ.get("POSTCARE_SKIP_MODEL_LOAD"):
+        logger.info("Skipping WoundModel load (POSTCARE_SKIP_MODEL_LOAD is set)")
+        return None
     try:
         return WoundModel()
     except Exception as exc:

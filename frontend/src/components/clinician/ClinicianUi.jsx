@@ -1,6 +1,25 @@
 export { WARDS, caseWard } from "../../lib/site";
 
-export function PriorityTag({ priority, pill = false }) {
+export function isReviewed(row) {
+  return row?.status === "reviewed";
+}
+
+export function PriorityTag({ priority, status, pill = false }) {
+  if (isReviewed({ status })) {
+    return (
+      <span
+        className={
+          pill
+            ? "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-500/10 border border-gray-500/20 text-gray-400 text-[10px] uppercase font-bold tracking-wider"
+            : "inline-flex items-center gap-1.5 text-gray-400 text-xs font-medium"
+        }
+      >
+        <span className="w-2 h-2 rounded-full bg-gray-500" />
+        Reviewed
+      </span>
+    );
+  }
+
   const key = (priority || "routine").toLowerCase();
 
   if (key === "high") {
@@ -81,15 +100,21 @@ export function fmtDateTime(iso) {
 }
 
 export function assessmentStatus(row) {
-  if (row.status === "submitted") {
-    return { label: "Order Placed", tone: "warning" };
+  if (isReviewed(row)) {
+    return { label: "Reviewed", tone: "success" };
   }
-  return { label: "Completed", tone: "success" };
+  if (row.status === "awaiting_review") {
+    return { label: "Assessed", tone: "info" };
+  }
+  if (row.status === "submitted") {
+    return { label: "Submitted", tone: "warning" };
+  }
+  return { label: "Assessed", tone: "info" };
 }
 
 export function reviewStatus(row) {
-  if (row.status === "reviewed") {
-    return { label: "Completed", tone: "success" };
+  if (isReviewed(row)) {
+    return { label: "Reviewed", tone: "success" };
   }
   if (row.status === "awaiting_review") {
     return { label: "Pending", tone: "warning" };
@@ -97,5 +122,5 @@ export function reviewStatus(row) {
   if (row.priority === "high") {
     return { label: "Push to Review", tone: "accent" };
   }
-  return { label: "Finalized", tone: "info" };
+  return { label: "Awaiting Review", tone: "info" };
 }
