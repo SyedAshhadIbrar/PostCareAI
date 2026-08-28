@@ -15,6 +15,7 @@
 html {
   min-height: 100%;
   -webkit-tap-highlight-color: transparent;
+  color-scheme: dark;
 }
 
 body {
@@ -24,6 +25,36 @@ body {
   overflow-x: hidden;
   font-family: "Inter", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Ensure typed text is visible in all inputs (login, chat, forms) */
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+textarea,
+select {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #00d9b5;
+}
+
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"])::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+}
+
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):-webkit-autofill,
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):-webkit-autofill:hover,
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  box-shadow: 0 0 0 1000px #1c1c1e inset;
+  transition: background-color 9999s ease-out 0s;
 }
 
 /* iOS-style cards */

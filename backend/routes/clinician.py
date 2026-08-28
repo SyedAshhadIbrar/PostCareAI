@@ -30,7 +30,12 @@ def _row(c) -> dict:
 
 @router.get("/cases")
 async def list_cases():
-    return [_row(c) for c in db.list_cases()]
+    cases = db.list_cases()
+    priority_order = {"high": 0, "needs_review": 1, "routine": 2}
+    cases.sort(key=lambda c: c.created_at or "", reverse=True)
+    cases.sort(key=lambda c: priority_order.get(c.clinician_priority or "routine", 2))
+    cases.sort(key=lambda c: 1 if c.status == "reviewed" else 0)
+    return [_row(c) for c in cases]
 
 
 @router.get("/stats")
