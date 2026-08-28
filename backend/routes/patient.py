@@ -131,13 +131,13 @@ async def upload_patient_log(
     case = PostCareCase(
         case_id=case_id,
         patient=PatientContext(
-            patient_name=str(data.get("patient_name", "PKLI Patient")),
+            patient_name=str(data.get("patient_name", "Patient")),
             pain_score=pain_level,
             procedure="Liver Transplant Surgery",
             post_op_day=post_op_day,
             consultant_surgeon="Dr. Chen",
             discharge_date="2026-08-12",
-            location="PKLI Lahore",
+            location="PostCare Recovery Unit",
             symptoms=active_symptoms,
             patient_note=patient_note,
         ),

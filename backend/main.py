@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,24 @@ from backend.routes.auth import router as auth_router
 from backend.spa import serve_react
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_dotenv() -> None:
+    env_path = REPO_ROOT / ".env"
+    if not env_path.is_file():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            os.environ.setdefault(key, value)
+
+
+_load_dotenv()
 
 app = FastAPI(
     title="PostCare API",
@@ -48,8 +67,12 @@ app.add_api_route(
     tags=["patient"],
 )
 
-app.mount("/ui/patient", StaticFiles(directory=REPO_ROOT / "frontend-old" / "patient", html=True), name="patient-ui")
-app.mount("/ui/clinician", StaticFiles(directory=REPO_ROOT / "frontend-old" / "clinician", html=True), name="clinician-ui")
+_legacy_patient_ui = REPO_ROOT / "frontend-old" / "patient"
+_legacy_clinician_ui = REPO_ROOT / "frontend-old" / "clinician"
+if _legacy_patient_ui.is_dir():
+    app.mount("/ui/patient", StaticFiles(directory=_legacy_patient_ui, html=True), name="patient-ui")
+if _legacy_clinician_ui.is_dir():
+    app.mount("/ui/clinician", StaticFiles(directory=_legacy_clinician_ui, html=True), name="clinician-ui")
 
 
 @app.on_event("startup")
@@ -74,7 +97,7 @@ def health():
         "postcare_gemini": {
             "configured": postcare_gemini.is_configured(),
             "agent_name": postcare_gemini.AGENT_NAME,
-            "model": postcare_gemini.MODEL,
+            "model": postcare_gemini.model_name(),
         },
         "rag": {
             "chunks_indexed": len(vector_store.chunks),

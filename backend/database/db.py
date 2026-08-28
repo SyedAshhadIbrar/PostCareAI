@@ -84,12 +84,18 @@ def update_case(case: PostCareCase) -> PostCareCase:
 _PRIORITY_ORDER = {"high": 0, "needs_review": 1, "routine": 2}
 
 
+def _case_sort_key(case: PostCareCase) -> tuple:
+    reviewed = 1 if case.status == "reviewed" else 0
+    priority = _PRIORITY_ORDER.get(case.clinician_priority or "routine", 9)
+    return (reviewed, priority, case.created_at or "")
+
+
 def list_cases() -> list[PostCareCase]:
     init_db()
     with _connect() as conn:
         rows = conn.execute("SELECT data, created_at FROM cases").fetchall()
     cases = [_load_case(row) for row in rows]
-    cases.sort(key=lambda c: _PRIORITY_ORDER.get(c.clinician_priority or "routine", 9))
+    cases.sort(key=_case_sort_key)
     return cases
 
 
