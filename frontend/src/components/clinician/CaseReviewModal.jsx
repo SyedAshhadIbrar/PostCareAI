@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PriorityTag } from "./ClinicianUi";
+import { API_BASE } from "../../lib/api";
 
 export default function CaseReviewModal({
   selectedCase,
@@ -8,6 +9,8 @@ export default function CaseReviewModal({
   onClose,
   onApprove,
 }) {
+  const [imageError, setImageError] = useState(false);
+
   useEffect(() => {
     if (!selectedCase) return undefined;
     const onKey = (e) => {
@@ -16,6 +19,10 @@ export default function CaseReviewModal({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedCase, onClose]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [selectedCase?.case_id, caseDetail?.has_wound_image]);
 
   if (!selectedCase) return null;
 
@@ -29,6 +36,10 @@ export default function CaseReviewModal({
     ? caseDetail.safety_flags
     : selectedCase?.safety_flags || [];
   const visualFindings = clinicianSummary?.visual_findings;
+  const hasImage = caseDetail?.has_wound_image === true;
+  const imageUrl = hasImage
+    ? `${API_BASE}${caseDetail.wound_image_url}`
+    : null;
 
   return (
     <div
@@ -37,7 +48,7 @@ export default function CaseReviewModal({
       role="presentation"
     >
       <div
-        className="bg-[#161616] border border-[#2a2a2a] rounded-xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden"
+        className="bg-[#161616] border border-[#2a2a2a] rounded-xl w-full max-w-4xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -75,6 +86,66 @@ export default function CaseReviewModal({
         </div>
 
         <div className="p-6 space-y-5 overflow-y-auto flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg overflow-hidden">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 pt-4 pb-2">
+                Wound Photo
+              </p>
+              {detailLoading ? (
+                <div className="aspect-[4/3] flex items-center justify-center text-sm text-gray-500">
+                  Loading…
+                </div>
+              ) : hasImage && !imageError ? (
+                <img
+                  src={imageUrl}
+                  alt={`Wound photo — ${selectedCase.patient_name}`}
+                  className="w-full aspect-[4/3] object-cover bg-black"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="aspect-[4/3] flex flex-col items-center justify-center gap-2 text-gray-500 px-4">
+                  <span className="material-symbols-outlined text-4xl text-gray-600">image_not_supported</span>
+                  <p className="text-sm text-center">
+                    {imageError ? "Could not load wound photo." : "No wound photo for this case."}
+                  </p>
+                  <p className="text-xs text-gray-600 text-center">New check-ins include saved images.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pain Level</p>
+                  <p className="text-2xl font-bold text-white">
+                    {selectedCase.pain_score ?? "—"}
+                    <span className="text-sm text-gray-500 font-normal">/10</span>
+                  </p>
+                </div>
+                <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Post-Op Day</p>
+                  <p className="text-2xl font-bold text-white">{selectedCase.post_op_day ?? "—"}</p>
+                </div>
+              </div>
+
+              {visualFindings && (
+                <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    MedSigLIP Visual Signals
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {Object.entries(visualFindings).map(([key, score]) => (
+                      <div key={key} className="flex justify-between gap-2 text-gray-300">
+                        <span className="capitalize text-gray-500">{key.replace(/_/g, " ")}</span>
+                        <span className="font-semibold text-white">{Math.round(score * 100)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
               <p className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -115,36 +186,6 @@ export default function CaseReviewModal({
                   </p>
                 </div>
               )}
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pain Level</p>
-              <p className="text-2xl font-bold text-white">
-                {selectedCase.pain_score ?? "—"}
-                <span className="text-sm text-gray-500 font-normal">/10</span>
-              </p>
-            </div>
-            <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Post-Op Day</p>
-              <p className="text-2xl font-bold text-white">{selectedCase.post_op_day ?? "—"}</p>
-            </div>
-          </div>
-
-          {visualFindings && (
-            <div className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                MedSigLIP Visual Signals
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                {Object.entries(visualFindings).map(([key, score]) => (
-                  <div key={key} className="flex justify-between gap-2 text-gray-300">
-                    <span className="capitalize text-gray-500">{key.replace(/_/g, " ")}</span>
-                    <span className="font-semibold text-white">{Math.round(score * 100)}%</span>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
 
