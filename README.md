@@ -1,6 +1,6 @@
 # PostCareAI
 
-**AI-powered post-operative wound care platform** — patients submit daily wound photos and symptom logs via a mobile app; a fine-tuned **MedSigLIP** model assesses wounds; **RAG + safety rules + LLM agents** guide recovery and triage cases on a **clinician web dashboard** (human-in-the-loop).
+**A Multimodal Multi-Agent System for Clinician Supervised Post-Operative Patient Follow-Up** — patients submit daily wound photos and symptom logs via a mobile app; a fine-tuned **MedSigLIP** model assesses wounds; **RAG + safety rules + LLM agents** guide recovery and triage cases on a **clinician web dashboard** (human-in-the-loop).
 
 > **Capstone prototype** — not clinically validated. Model outputs and agent responses require review by qualified clinicians. Do not use for real medical decisions.
 
@@ -18,7 +18,7 @@
 - **Per-label Youden J thresholds** tuned for clinical safety (high sensitivity on infection & urgency)
 - **Multi-agent pipeline** — triage → patient guidance → clinician handoff (Gemini or rule fallback)
 - **Vector RAG** over clinical care documents for 24/7 patient coaching
-- **Dual frontend** — mobile-first patient app (Whoop-style) + web clinician command center
+- **Dual frontend** — mobile-first patient app + web clinician command center
 - **Automated tests** — pytest suite covering wound API, safety rules, triage, and RAG
 
 ---
