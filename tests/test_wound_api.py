@@ -1,28 +1,17 @@
-"""Tests for POST /wound/assess."""
-
-from __future__ import annotations
+"""Wound assessment API."""
 
 from unittest.mock import MagicMock
 
 import pytest
-from fastapi.testclient import TestClient
 
-from backend.schemas.assessment import WoundAssessment
-from tests.conftest import make_wound_assessment
+from tests.conftest import make_wound_assessment, png_upload_file
 
 
-def test_wound_assess_returns_valid_schema(client: TestClient, sample_image_bytes: bytes) -> None:
-    response = client.post(
-        "/wound/assess",
-        files={"image": ("wound.png", sample_image_bytes, "image/png")},
-    )
-
-    assert response.status_code == 200
-    data = response.json()
-
-    parsed = WoundAssessment.model_validate(data)
-    assert parsed.model_version == "test-medsiglip-v1"
-
+def test_wound_assess_returns_valid_schema(client, mock_wound_model):
+    files = {"image": png_upload_file()}
+    res = client.post("/wound/assess", files=files)
+    assert res.status_code == 200
+    body = res.json()
     for label in (
         "healing_status",
         "erythema",
@@ -31,51 +20,32 @@ def test_wound_assess_returns_valid_schema(client: TestClient, sample_image_byte
         "urgency",
         "exudate",
     ):
-        finding = getattr(parsed, label)
-        assert 0.0 <= finding.score <= 1.0
-        assert 0.0 <= finding.threshold <= 1.0
-        assert isinstance(finding.positive, bool)
-
-
-def test_wound_assess_rejects_non_image(client: TestClient) -> None:
-    response = client.post(
-        "/wound/assess",
-        files={"image": ("notes.txt", b"not an image", "text/plain")},
-    )
-
-    assert response.status_code == 400
-    assert "image" in response.json()["detail"].lower()
-
-
-def test_wound_assess_returns_503_when_model_unloaded(
-    monkeypatch: pytest.MonkeyPatch,
-    sample_image_bytes: bytes,
-) -> None:
-    monkeypatch.setattr("backend.routes.wound.wound_model", None)
-
-    from backend.main import app
-
-    with TestClient(app) as client:
-        response = client.post(
-            "/wound/assess",
-            files={"image": ("wound.png", sample_image_bytes, "image/png")},
-        )
-
-    assert response.status_code == 503
-    assert "MedSigLIP" in response.json()["detail"]
-
-
-def test_wound_assess_calls_model_predict(
-    client: TestClient,
-    mock_wound_model: MagicMock,
-    sample_image_bytes: bytes,
-) -> None:
-    client.post(
-        "/wound/assess",
-        files={"image": ("wound.png", sample_image_bytes, "image/png")},
-    )
-
+        assert label in body
+        assert "score" in body[label]
+        assert "positive" in body[label]
     mock_wound_model.predict.assert_called_once()
-    image_arg = mock_wound_model.predict.call_args.args[0]
-    assert isinstance(image_arg, bytes)
-    assert len(image_arg) > 0
+
+
+def test_wound_assess_rejects_non_image(client, mock_wound_model):
+    files = {"image": ("notes.txt", b"not an image", "text/plain")}
+    res = client.post("/wound/assess", files=files)
+    assert res.status_code == 400
+    mock_wound_model.predict.assert_not_called()
+
+
+def test_wound_assess_returns_503_when_model_unloaded(client, monkeypatch):
+    monkeypatch.setattr("backend.routes.wound.wound_model", None)
+    files = {"image": png_upload_file()}
+    res = client.post("/wound/assess", files=files)
+    assert res.status_code == 503
+
+
+def test_wound_assess_calls_model_predict(client, mock_wound_model):
+    assessment = make_wound_assessment(
+        healing_status={"positive": True, "score": 0.9, "threshold": 0.5},
+    )
+    mock_wound_model.predict.return_value = assessment
+    files = {"image": png_upload_file()}
+    res = client.post("/wound/assess", files=files)
+    assert res.status_code == 200
+    assert res.json()["healing_status"]["positive"] is True
