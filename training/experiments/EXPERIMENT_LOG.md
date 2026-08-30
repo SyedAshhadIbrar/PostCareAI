@@ -23,11 +23,20 @@ this lineage via `parent_run_name` and `mlflow.parentRunId` tags when Run 1 exis
 
 | Parameter | Run 1 | Run 2 | Effect |
 |---|---|---|---|
-| `N_UNFREEZE` | 4 | **8** | ~2x trainable capacity (~14% -> ~28%) |
-| `GRAD_ACCUM` | 16 | **4** | 8 -> 30 optimizer steps/epoch |
-| `EPOCHS` | 5 | **10** | 40 -> **300** total optimizer steps (7.5x) |
-| Learning rate | single 5e-5 | **differential** backbone=1.5e-5 / head=8e-5 | Preserve pretrained features, faster head learning |
-| Threshold | fixed 0.5 | **per-label Youden's J** | Corrects miscalibration |
+| `N_UNFREEZE` | 4 | **8** | ~2× trainable capacity (~14% → ~28%) |
+| `GRAD_ACCUM` | 16 | **4** | 8 → 30 optimizer steps/epoch |
+| `EPOCHS` | 5 | **10** | 40 → **300** total optimizer steps (7.5×) |
+| Learning rate | single 5e-5 | **differential** backbone=1.5e-5 / head=8e-5 | Preserves pretrained features, fast head convergence |
+| Threshold | fixed 0.5 | **per-label (Youden's J)** | Corrects miscalibration (e.g., healing sens=0.84/spec=0.26) |
+
+### Key design decisions
+
+- **Expanded selective freezing**: Last **8** encoder blocks + classification head are trainable (~28% of params); deeper layers give the model more expressive capacity without saturating T4 VRAM
+- **Differential learning rate**: Backbone blocks update at `BACKBONE_LR=1.5e-5` (gentle, preserves pretrained SigLIP features); classifier head at `HEAD_LR=8e-5` (fast learning from random initialization)
+- **Masked BCE loss**: 3 of 6 labels have MISSING values — loss is zeroed out for those entries instead of dropping entire samples
+- **Light augmentation**: Horizontal flip + rotation + color jitter to compensate for small dataset (480 train images)
+- **eval_loss for model selection**: Val set has only 69 images — per-label AUC too noisy for checkpoint comparison
+- **Per-label threshold tuning**: Youden's J (J = sensitivity + specificity − 1) on validation set replaces a fixed threshold=0.5 after training
 
 ## Run 1 Observations (Why Run 2 Was Needed)
 

@@ -14,7 +14,7 @@
 ## Highlights
 
 - **Fine-tuned MedSigLIP** (`google/medsiglip-448`) on SurgWound — 6-label multi-label wound classification
-- **0.745 macro AUC** on held-out test set (137 samples); **0.793 validation macro AUC** at best epoch
+- **Macro ROC-AUC: 0.7450** on held-out test set (137 samples); **0.745 validation macro AUC** at best epoch
 - **Per-label Youden J thresholds** tuned for clinical safety (high sensitivity on infection & urgency)
 - **Multi-agent pipeline** — triage → patient guidance → clinician handoff (Gemini or rule fallback)
 - **Vector RAG** over clinical care documents for 24/7 patient coaching
@@ -229,11 +229,11 @@ erDiagram
 | Infection risk | 0.730 | |
 | Urgency | 0.710 | Rarest class (57 positives in train) |
 | Erythema | 0.676 | |
-| **Macro AUC** | **0.745** | |
+| **Macro ROC-AUC** | **0.7450** | |
 
 ### Production operating points (Youden J thresholds)
 
-Thresholds shift sensitivity/specificity tradeoff; macro AUC is unchanged.
+Thresholds shift sensitivity/specificity tradeoff; macro ROC-AUC is unchanged.
 
 | Label | Threshold | Sensitivity | Specificity | Design intent |
 |-------|-----------|-------------|-------------|---------------|
@@ -263,8 +263,29 @@ Thresholds shift sensitivity/specificity tradeoff; macro AUC is unchanged.
 | Unfrozen blocks | 4 | **8** |
 | Learning rate | single 5e-5 | differential backbone/head |
 | Thresholds | fixed 0.5 | **per-label Youden J** |
-| Val macro AUC (best epoch) | underfit | **0.793** |
+| Val macro AUC (best epoch) | underfit | **0.745** |
 | Training time | — | 22.5 min |
+
+### Run 1 → Run 2 (hyperparameters)
+
+| Parameter | Run 1 | Run 2 | Effect |
+|---|---|---|---|
+| `N_UNFREEZE` | 4 | **8** | ~2× trainable capacity (~14% → ~28%) |
+| `GRAD_ACCUM` | 16 | **4** | 8 → 30 optimizer steps/epoch |
+| `EPOCHS` | 5 | **10** | 40 → **300** total optimizer steps (7.5×) |
+| Learning rate | single 5e-5 | **differential** backbone=1.5e-5 / head=8e-5 | Preserves pretrained features, fast head convergence |
+| Threshold | fixed 0.5 | **per-label (Youden's J)** | Corrects miscalibration (e.g., healing sens=0.84/spec=0.26) |
+
+### Key design decisions
+
+- **Expanded selective freezing** — Last **8** encoder blocks + classification head are trainable (~28% of params); deeper layers give the model more expressive capacity without saturating T4 VRAM
+- **Differential learning rate** — Backbone at `BACKBONE_LR=1.5e-5` (preserves pretrained SigLIP features); head at `HEAD_LR=8e-5` (fast learning from random initialization)
+- **Masked BCE loss** — 3 of 6 labels have MISSING values; loss is zeroed for those entries instead of dropping entire samples
+- **Light augmentation** — Horizontal flip, rotation, and color jitter for a small dataset (480 train images)
+- **eval_loss for model selection** — Validation set has only 69 images; per-label AUC is too noisy for checkpoint comparison
+- **Per-label threshold tuning** — Youden's J (J = sensitivity + specificity − 1) on the validation set replaces fixed threshold=0.5 after training
+
+Full experiment lineage: [`training/experiments/EXPERIMENT_LOG.md`](training/experiments/EXPERIMENT_LOG.md)
 
 ### Class imbalance handling
 
