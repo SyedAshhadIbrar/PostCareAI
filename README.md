@@ -33,6 +33,24 @@
 
 **API docs:** http://127.0.0.1:8000/docs
 
+### Screenshots
+
+#### Patient app (mobile-first)
+
+| Dashboard | Daily check-in | Recovery metrics |
+|-----------|----------------|------------------|
+| ![Patient dashboard](docs/screenshots/01-patient-dashboard.png) | ![Patient check-in](docs/screenshots/02-patient-checkin.png) | ![Patient recovery](docs/screenshots/03-patient-recovery.png) |
+
+| AI Recovery Coach (RAG) |
+|-------------------------|
+| ![AI Coach chat](docs/screenshots/04-patient-ai-coach.png) |
+
+#### Clinician portal (web dashboard)
+
+| Command center | Case review — wound + AI scores | Case review — handoff notes |
+|----------------|----------------------------------|-----------------------------|
+| ![Clinician portal](docs/screenshots/05-clinician-portal.png) | ![Wound photo and MedSigLIP scores](docs/screenshots/06-clinician-review-wound.png) | ![Clinician handoff notes](docs/screenshots/07-clinician-review-notes.png) |
+
 ---
 
 ## Architecture
@@ -267,7 +285,7 @@ Training set: **480 samples × 6 labels**. `pos_weight` in BCE loss upweights ra
 
 ### Patient app (mobile-first)
 
-Whoop-inspired dark UI with bottom tab navigation:
+Dark UI with bottom tab navigation:
 
 | Tab | Route | Purpose |
 |-----|-------|---------|
